@@ -1,0 +1,58 @@
+# ── SAP CAP build artifacts ───────────────────────────────────────
+_out/
+gen/
+.cds_gen.log
+connection.properties
+
+# ── Database locale (SQLite dev) ──────────────────────────────────
+*.db
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# ── Segreti e configurazione locale ───────────────────────────────
+# Questi file contengono binding BTP (VCAP_SERVICES) o credenziali
+default-env.json
+default-*.json
+.env
+.env.*
+*.env
+
+# ── MTA build artifacts ───────────────────────────────────────────
+*_mta_build_tmp/
+*.mtar
+mta_archives/
+
+# ── Node.js ───────────────────────────────────────────────────────
+node_modules/
+
+# ── macOS ─────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ── Editor / IDE ──────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.orig
+~$*
+
+# ── SAP App Studio / Web IDE ──────────────────────────────────────
+.che/
+.gen/
+fioriHtmlRunner.html
+.*/fioriHtmlRunner.html
+visual_ext_index.html
+extended_runnable_file.html
+.*/extended_runnable_file.html
+sap-ui-cachebuster-info.json
+mock_preview_sapui5.html
+.*/mock_preview_sapui5.html
+UIAdaptation_index.html
+changes_preview.js
+AppVariant_index.html
+AppVariantPreviewPayload.zip
+mergedManifestDescriptor.json
+APIExternalProducer.js
+.*/APIExternalProducer.js

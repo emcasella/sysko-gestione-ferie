@@ -1,0 +1,192 @@
+<mvc:View
+  controllerName="sysko.ferie.manager.controller.Dashboard"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:core="sap.ui.core"
+  displayBlock="true">
+
+  <Page showHeader="false" backgroundDesign="Transparent" enableScrolling="true">
+    <content>
+
+      <!-- ── Page header ──────────────────────────────────── -->
+      <Toolbar class="sk-page-header">
+        <Title text="Dashboard" level="H1"/>
+        <ToolbarSpacer/>
+      </Toolbar>
+
+      <!-- ── KPI cards ────────────────────────────────────── -->
+      <FlexBox id="kpiBox" wrap="Wrap" class="sapUiResponsiveMargin sk-kpi-box">
+
+        <VBox id="kpiCardPending" alignItems="Start" class="sk-kpi-card sk-kpi-card--clickable">
+          <Label text="IN ATTESA" class="sk-kpi-label"/>
+          <ObjectNumber id="kpiPending" number="{kpi>/pending}" unit=""
+                        emphasized="true" state="Warning" class="sk-kpi-number"/>
+          <Label text="richieste" class="sk-kpi-sublabel"/>
+        </VBox>
+
+        <VBox id="kpiCardApproved" alignItems="Start" class="sk-kpi-card sk-kpi-card--clickable">
+          <Label text="APPROVATE" class="sk-kpi-label"/>
+          <ObjectNumber id="kpiApproved" number="{kpi>/approved}" unit=""
+                        emphasized="true" state="Success" class="sk-kpi-number"/>
+          <Label text="questo mese" class="sk-kpi-sublabel"/>
+        </VBox>
+
+        <VBox id="kpiCardRejected" alignItems="Start" class="sk-kpi-card sk-kpi-card--clickable">
+          <Label text="RIFIUTATE" class="sk-kpi-label"/>
+          <ObjectNumber id="kpiRejected" number="{kpi>/rejected}" unit=""
+                        emphasized="true" state="Error" class="sk-kpi-number"/>
+          <Label text="questo mese" class="sk-kpi-sublabel"/>
+        </VBox>
+
+        <VBox id="kpiCardOverlap" alignItems="Start" class="sk-kpi-card sk-kpi-card--clickable">
+          <Label text="SOVRAPPOSIZIONI" class="sk-kpi-label"/>
+          <ObjectNumber id="kpiOverlap" number="{kpi>/overlap}" unit=""
+                        emphasized="true" state="None" class="sk-kpi-number"/>
+          <Label text="oggi" class="sk-kpi-sublabel"/>
+        </VBox>
+
+      </FlexBox>
+
+      <!-- ── Banner sovrapposizioni (condizionale) ─────────── -->
+      <Panel id="overlapPanel"
+             visible="{overlap>/hasPairs}"
+             class="sapUiResponsiveMargin sk-overlap-banner"
+             expandable="false" expanded="true">
+
+        <headerToolbar>
+          <Toolbar>
+            <Title text="Richieste Sovrapposte" level="H3"/>
+            <ObjectStatus
+              text="{= ${overlap>/pairCount} + ' coppie' }"
+              state="Warning"
+              class="sapUiTinyMarginBegin"/>
+            <ToolbarSpacer/>
+            <Label text="Dal" class="sapUiTinyMarginEnd"/>
+            <DatePicker id="dpOverlapDal"
+              valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy"
+              width="130px"/>
+            <Label text="Al" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+            <DatePicker id="dpOverlapAl"
+              valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy"
+              width="130px"
+              class="sapUiTinyMarginEnd"/>
+            <Button text="Cerca" type="Emphasized"
+                    press=".onCercaOverlap"/>
+          </Toolbar>
+        </headerToolbar>
+
+        <content>
+          <List id="overlapList"
+                items="{overlap>/pairs}"
+                noDataText="Nessuna sovrapposizione nel periodo selezionato."
+                class="sapUiNoContentPadding">
+            <CustomListItem>
+              <HBox alignItems="Center" justifyContent="SpaceBetween"
+                    class="sapUiSmallMarginBeginEnd sapUiTinyMarginTopBottom">
+                <VBox>
+                  <Text text="{overlap>nomeA} ↔ {overlap>nomeB}"
+                        class="sapUiSmallMarginBottom"/>
+                  <Text text="Sovrapposizione: {path: 'overlap>overlapDal', formatter: '.formatter.formatDate'} – {path: 'overlap>overlapAl', formatter: '.formatter.formatDate'}"/>
+                </VBox>
+                <HBox class="sapUiSmallMarginBegin">
+                  <ObjectStatus
+                    text="{overlap>statoLabelA}"
+                    state="{path: 'overlap>statoA', formatter: '.formatter.statusState'}"
+                    class="sapUiTinyMarginEnd"/>
+                  <ObjectStatus
+                    text="{overlap>statoLabelB}"
+                    state="{path: 'overlap>statoB', formatter: '.formatter.statusState'}"
+                    class="sapUiTinyMarginEnd"/>
+                  <ObjectNumber
+                    number="{overlap>giorniSovrapposti}"
+                    unit="gg"
+                    state="Warning"/>
+                </HBox>
+              </HBox>
+            </CustomListItem>
+          </List>
+        </content>
+
+      </Panel>
+
+      <!-- ── Tabella richieste ─────────────────────────────── -->
+      <Table id="requestsTable"
+             items="{path: '/RichiesteFerie', parameters: {$orderby: 'dataInvio desc'}}"
+             growing="true" growingThreshold="20"
+             noDataText="Nessuna richiesta trovata"
+             class="sapUiResponsiveMargin sk-table">
+
+        <headerToolbar>
+          <Toolbar>
+            <Title text="Tutte le Richieste" level="H3"/>
+          </Toolbar>
+        </headerToolbar>
+
+        <infoToolbar>
+          <Toolbar active="false">
+            <Select id="filterStato" change=".onFilterChange" width="145px">
+              <core:Item key=""          text="Tutti gli stati"/>
+              <core:Item key="PENDING"   text="In attesa"/>
+              <core:Item key="APPROVED"  text="Approvate"/>
+              <core:Item key="REJECTED"  text="Rifiutate"/>
+              <core:Item key="CANCELLED" text="Annullate"/>
+            </Select>
+            <Label text="Dal" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+            <DatePicker id="dpDal" placeholder="gg/mm/aaaa"
+              valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy"
+              change=".onFilterChange" width="120px"/>
+            <Label text="Al" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+            <DatePicker id="dpAl" placeholder="gg/mm/aaaa"
+              valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy"
+              change=".onFilterChange" width="120px"/>
+            <Button icon="sap-icon://clear-filter" tooltip="Rimuovi filtri"
+                    press=".onClearFilters" class="sapUiTinyMarginBegin"/>
+          </Toolbar>
+        </infoToolbar>
+
+        <columns>
+          <Column><Text text="Dipendente"/></Column>
+          <Column><Text text="Tipo"/></Column>
+          <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Dal"/></Column>
+          <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Al"/></Column>
+          <Column hAlign="End" minScreenWidth="Tablet" demandPopin="true">
+            <Text text="Giorni"/>
+          </Column>
+          <Column><Text text="Stato"/></Column>
+          <Column minScreenWidth="Desktop" demandPopin="true">
+            <Text text="Gestita da"/>
+          </Column>
+          <Column width="90px" minScreenWidth="Desktop" demandPopin="true">
+            <Text text="Azioni"/>
+          </Column>
+        </columns>
+
+        <items>
+          <ColumnListItem type="Navigation" press=".onSelectRichiesta">
+            <cells>
+              <Text text="{dipendanteCognome} {dipendanteNome}"/>
+              <Text text="{tipoAssenzaLabel}"/>
+              <Text text="{path: 'dataInizio', formatter: '.formatter.formatDate'}"/>
+              <Text text="{path: 'dataFine',   formatter: '.formatter.formatDate'}"/>
+              <ObjectNumber number="{path: 'giorniRichiesti', type: 'sap.ui.model.odata.type.Decimal', formatOptions: {minFractionDigits: 0, maxFractionDigits: 2}}" unit="gg" emphasized="false"/>
+              <ObjectStatus
+                text="{path: 'stato', formatter: '.formatter.statusText'}"
+                state="{path: 'stato', formatter: '.formatter.statusState'}"/>
+              <Text text="{managerCognome} {managerNome}"/>
+              <FlexBox visible="{path: 'stato', targetType: 'any', formatter: '.formatter.isPending'}">
+                <Button tooltip="Approva" type="Accept" icon="sap-icon://accept"
+                        press=".onApprovaInline"
+                        class="sapUiTinyMarginEnd"/>
+                <Button tooltip="Rifiuta" type="Reject" icon="sap-icon://decline"
+                        press=".onRifiutaInline"/>
+              </FlexBox>
+            </cells>
+          </ColumnListItem>
+        </items>
+
+      </Table>
+
+    </content>
+  </Page>
+
+</mvc:View>

@@ -1,0 +1,142 @@
+<mvc:View
+  controllerName="sysko.ferie.employee.controller.Main"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:core="sap.ui.core"
+  displayBlock="true">
+
+  <Page showHeader="false" backgroundDesign="Transparent" enableScrolling="true">
+    <content>
+
+      <!-- ── Page header ── -->
+      <Toolbar class="sk-page-header">
+        <Title text="Le Mie Ferie" level="H1"/>
+        <ToolbarSpacer/>
+        <Button text="+ Nuova Richiesta" type="Emphasized" press=".onNuovaRichiesta"/>
+      </Toolbar>
+
+      <!-- ── Saldo cards ── -->
+      <FlexBox wrap="Wrap" class="sapUiResponsiveMargin sk-kpi-box">
+
+        <VBox alignItems="Start" class="sk-kpi-card">
+          <Label text="FERIE TOTALI" class="sk-kpi-label"/>
+          <ObjectNumber number="{saldo>/giorniTotali}" unit="" emphasized="true" state="None" class="sk-kpi-number"/>
+          <Label text="giorni" class="sk-kpi-sublabel"/>
+        </VBox>
+
+        <VBox alignItems="Start" class="sk-kpi-card">
+          <Label text="FERIE USATE" class="sk-kpi-label"/>
+          <ObjectNumber number="{saldo>/giorniUsati}" unit="" emphasized="true" state="Warning" class="sk-kpi-number"/>
+          <Label text="giorni" class="sk-kpi-sublabel"/>
+        </VBox>
+
+        <VBox alignItems="Start" class="sk-kpi-card">
+          <Label text="FERIE RESIDUE" class="sk-kpi-label"/>
+          <ObjectNumber number="{saldo>/giorniResidui}" unit="" emphasized="true" state="Success" class="sk-kpi-number"/>
+          <Label text="giorni" class="sk-kpi-sublabel"/>
+        </VBox>
+
+        <VBox alignItems="Start" class="sk-kpi-card">
+          <Label text="PERMESSI TOT." class="sk-kpi-label"/>
+          <ObjectNumber number="{saldo>/giorniPermesso}" unit="" emphasized="true" state="None" class="sk-kpi-number"/>
+          <Label text="ore" class="sk-kpi-sublabel"/>
+        </VBox>
+
+        <VBox alignItems="Start" class="sk-kpi-card">
+          <Label text="PERMESSI USATI" class="sk-kpi-label"/>
+          <ObjectNumber number="{saldo>/giorniPermessoUsati}" unit="" emphasized="true" state="Warning" class="sk-kpi-number"/>
+          <Label text="ore" class="sk-kpi-sublabel"/>
+        </VBox>
+
+        <VBox alignItems="Start" class="sk-kpi-card">
+          <Label text="ROL USATI" class="sk-kpi-label"/>
+          <ObjectNumber number="{saldo>/giorniRolUsati}" unit="" emphasized="true" state="Warning" class="sk-kpi-number"/>
+          <Label text="giorni" class="sk-kpi-sublabel"/>
+        </VBox>
+
+        <VBox alignItems="Start" class="sk-kpi-card">
+          <Label text="MALATTIA" class="sk-kpi-label"/>
+          <ObjectNumber number="{saldo>/giorniMalattiaUsati}" unit="" emphasized="true" state="Error" class="sk-kpi-number"/>
+          <Label text="giorni" class="sk-kpi-sublabel"/>
+        </VBox>
+
+        <VBox alignItems="Start" class="sk-kpi-card">
+          <Label text="LUTTO" class="sk-kpi-label"/>
+          <ObjectNumber number="{saldo>/giorniLuttoUsati}" unit="" emphasized="true" state="Warning" class="sk-kpi-number"/>
+          <Label text="giorni" class="sk-kpi-sublabel"/>
+        </VBox>
+
+        <VBox alignItems="Start" class="sk-kpi-card">
+          <Label text="MATRIMONIO" class="sk-kpi-label"/>
+          <ObjectNumber number="{saldo>/giorniMatrimonioUsati}" unit="" emphasized="true" state="Warning" class="sk-kpi-number"/>
+          <Label text="giorni" class="sk-kpi-sublabel"/>
+        </VBox>
+
+      </FlexBox>
+
+      <!-- ── Tabella richieste ── -->
+      <Table id="richiesteTable"
+             items="{path: '/MieRichieste', parameters: {$orderby: 'dataInvio desc'}}"
+             growing="true" growingThreshold="15"
+             noDataText="Nessuna richiesta trovata"
+             updateFinished=".onTableUpdateFinished"
+             class="sapUiResponsiveMargin sk-table">
+
+        <headerToolbar>
+          <Toolbar>
+            <Title text="Le Mie Richieste" level="H3"/>
+          </Toolbar>
+        </headerToolbar>
+
+        <infoToolbar>
+          <Toolbar active="false">
+            <Select id="filterStato" change=".onFilterChange" width="145px">
+              <core:Item key=""          text="Tutti gli stati"/>
+              <core:Item key="PENDING"   text="In attesa"/>
+              <core:Item key="APPROVED"  text="Approvate"/>
+              <core:Item key="REJECTED"  text="Rifiutate"/>
+              <core:Item key="CANCELLED" text="Annullate"/>
+            </Select>
+            <Label text="Dal" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+            <DatePicker id="dpDal" placeholder="gg/mm/aaaa"
+              valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy"
+              change=".onFilterChange" width="120px"/>
+            <Label text="Al" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+            <DatePicker id="dpAl" placeholder="gg/mm/aaaa"
+              valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy"
+              change=".onFilterChange" width="120px"/>
+            <Button icon="sap-icon://clear-filter" tooltip="Rimuovi filtri"
+                    press=".onClearFilters" class="sapUiTinyMarginBegin"/>
+          </Toolbar>
+        </infoToolbar>
+
+        <columns>
+          <Column><Text text="Tipo"/></Column>
+          <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Dal"/></Column>
+          <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Al"/></Column>
+          <Column hAlign="End" minScreenWidth="Tablet" demandPopin="true"><Text text="Giorni"/></Column>
+          <Column><Text text="Stato"/></Column>
+          <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Note Manager"/></Column>
+        </columns>
+
+        <items>
+          <ColumnListItem type="Navigation" press=".onSelectRichiesta">
+            <cells>
+              <Text text="{tipoAssenzaLabel}"/>
+              <Text text="{path: 'dataInizio', formatter: '.formatter.formatDate'}"/>
+              <Text text="{path: 'dataFine',   formatter: '.formatter.formatDate'}"/>
+              <ObjectNumber number="{path: 'giorniRichiesti', type: 'sap.ui.model.odata.type.Decimal', formatOptions: {minFractionDigits: 0, maxFractionDigits: 2}}" unit="gg" emphasized="false"/>
+              <ObjectStatus
+                text="{path: 'stato', formatter: '.formatter.statusText'}"
+                state="{path: 'stato', formatter: '.formatter.statusState'}"/>
+              <Text text="{noteManager}" wrapping="false" maxLines="1"/>
+            </cells>
+          </ColumnListItem>
+        </items>
+
+      </Table>
+
+    </content>
+  </Page>
+
+</mvc:View>

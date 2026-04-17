@@ -1,0 +1,331 @@
+/* ============================================================
+   SYSKO – Design System & Component Overrides
+   Employee App · UI5 1.120 / SAP Horizon theme
+   ============================================================ */
+
+/* ── Design Tokens ────────────────────────────────────────── */
+:root {
+  --sk-primary:       #0070f2;
+  --sk-primary-dark:  #003d8f;
+  --sk-bg:            #f8fafc;
+  --sk-surface:       #ffffff;
+  --sk-border:        #e2e8f0;
+  --sk-text:          #1e293b;
+  --sk-subtext:       #64748b;
+  --sk-muted:         #94a3b8;
+  --sk-success:       #22c55e;
+  --sk-success-bg:    #f0fdf4;
+  --sk-success-bd:    #bbf7d0;
+  --sk-success-tx:    #16a34a;
+  --sk-warning:       #f59e0b;
+  --sk-warning-bg:    #fffbeb;
+  --sk-warning-bd:    #fde68a;
+  --sk-warning-tx:    #d97706;
+  --sk-danger:        #ef4444;
+  --sk-danger-bg:     #fef2f2;
+  --sk-danger-bd:     #fecaca;
+  --sk-danger-tx:     #dc2626;
+  --sk-shadow:        0 1px 4px rgba(0,0,0,.06);
+}
+
+/* ── Global background ───────────────────────────────────── */
+html,
+body.sapUiBody,
+.sapMApp,
+.sapMAppInnerHtml,
+.sapMPage,
+.sapMPageBgStandard { background: var(--sk-bg) !important; }
+
+/* ── Layout sidebar + main ───────────────────────────────── */
+.sk-layout {
+  display:     flex   !important;
+  height:      100vh  !important;
+  overflow:    hidden !important;
+}
+.sk-layout > .sapMApp {
+  flex:       1       !important;
+  min-width:  0       !important;
+  height:     100%    !important;
+  overflow-y: auto    !important;
+  overflow-x: hidden  !important;
+}
+/* Override SAP UI5 absolute positioning → natural flow */
+.sk-layout .sapMNavConPages {
+  position:   relative !important;
+  height:     auto     !important;
+  min-height: 100%     !important;
+  overflow:   visible  !important;
+}
+.sk-layout .sapMPage {
+  position: relative !important;
+  height:   auto     !important;
+}
+.sk-layout .sapMPage > section {
+  height:   auto     !important;
+  overflow: visible  !important;
+}
+
+/* ── Sidebar (160px — employee) ──────────────────────────── */
+.sk-sidebar {
+  width:          160px;
+  flex-shrink:    0;
+  background:     var(--sk-surface);
+  border-right:   1px solid var(--sk-border);
+  display:        flex;
+  flex-direction: column;
+  height:         100%;
+  overflow:       hidden;
+  font-family:    "72", system-ui, sans-serif;
+}
+
+.sk-sidebar-logo {
+  display:       flex;
+  align-items:   center;
+  gap:           8px;
+  padding:       16px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  flex-shrink:   0;
+}
+.sk-logo-circle {
+  width:           28px;
+  height:          28px;
+  background:      linear-gradient(135deg, var(--sk-primary), var(--sk-primary-dark));
+  border-radius:   7px;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  color:           #fff;
+  font-size:       12px;
+  font-weight:     800;
+  flex-shrink:     0;
+}
+.sk-logo-brand {
+  font-size:   15px;
+  font-weight: 700;
+  color:       var(--sk-text);
+}
+
+.sk-nav {
+  flex:           1;
+  padding:        10px 8px;
+  display:        flex;
+  flex-direction: column;
+  gap:            2px;
+}
+.sk-nav-item {
+  display:         flex;
+  align-items:     center;
+  gap:             8px;
+  padding:         8px 10px;
+  border-radius:   7px;
+  color:           var(--sk-subtext);
+  font-size:       14px;
+  font-weight:     500;
+  text-decoration: none;
+  cursor:          pointer;
+  transition:      background .12s, color .12s;
+  user-select:     none;
+}
+.sk-nav-item svg   { flex-shrink: 0; }
+.sk-nav-item:hover { background: #f8fafc; color: var(--sk-text); }
+.sk-nav-item.sk-nav-active {
+  background:  #eff6ff;
+  color:       #1d4ed8;
+  font-weight: 600;
+}
+.sk-nav-item.sk-nav-active svg { stroke: #2563eb; }
+
+.sk-sidebar-footer {
+  display:     flex;
+  align-items: center;
+  gap:         6px;
+  padding:     10px 8px;
+  border-top:  1px solid #f1f5f9;
+  flex-shrink: 0;
+}
+/* Avatar employee: verde */
+.sk-avatar {
+  width:           26px;
+  height:          26px;
+  background:      linear-gradient(135deg, #22c55e, #16a34a);
+  border-radius:   50%;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  color:           #fff;
+  font-size:       11px;
+  font-weight:     700;
+  flex-shrink:     0;
+}
+.sk-user-info {
+  flex:           1;
+  display:        flex;
+  flex-direction: column;
+  min-width:      0;
+}
+.sk-user-name {
+  font-size:     13px;
+  font-weight:   600;
+  color:         var(--sk-text);
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+}
+.sk-user-role {
+  font-size: 11px;
+  color:     var(--sk-muted);
+}
+.sk-logout {
+  color:           var(--sk-muted);
+  cursor:          pointer;
+  flex-shrink:     0;
+  display:         flex;
+  align-items:     center;
+  text-decoration: none;
+  padding:         3px;
+  border-radius:   5px;
+  transition:      color .12s, background .12s;
+}
+.sk-logout:hover {
+  color:      var(--sk-danger-tx);
+  background: var(--sk-danger-bg);
+}
+
+/* ── Page header ─────────────────────────────────────────── */
+.sk-page-header {
+  background:    var(--sk-bg)               !important;
+  border-bottom: 1px solid var(--sk-border) !important;
+  padding:       0 24px                     !important;
+  height:        60px                       !important;
+}
+.sk-page-header .sapMTitle {
+  font-size:   23px             !important;
+  font-weight: 800              !important;
+  color:       var(--sk-text)   !important;
+}
+
+/* ── KPI / Saldo cards ───────────────────────────────────── */
+.sk-kpi-box {
+  display:   flex       !important;
+  gap:       14px       !important;
+  padding:   0 24px     !important;
+  flex-wrap: wrap       !important;
+}
+.sk-kpi-card {
+  background:    var(--sk-surface)           !important;
+  border:        1px solid var(--sk-border)  !important;
+  border-radius: 12px                        !important;
+  padding:       16px 20px                   !important;
+  box-shadow:    var(--sk-shadow)            !important;
+  flex:          1                           !important;
+  min-width:     120px                       !important;
+  max-width:     180px                       !important;
+}
+.sk-kpi-label {
+  font-size:      12px              !important;
+  font-weight:    600               !important;
+  color:          var(--sk-muted)   !important;
+  text-transform: uppercase         !important;
+  letter-spacing: .5px              !important;
+  margin-bottom:  8px               !important;
+}
+.sk-kpi-number .sapMObjectNumberText {
+  font-size:   34px !important;
+  font-weight: 800  !important;
+  line-height: 1    !important;
+}
+.sk-kpi-number.sapMObjectNumberStatusWarning .sapMObjectNumberText { color: var(--sk-warning) !important; }
+.sk-kpi-number.sapMObjectNumberStatusSuccess .sapMObjectNumberText { color: var(--sk-success) !important; }
+.sk-kpi-number.sapMObjectNumberStatusError   .sapMObjectNumberText { color: var(--sk-danger)  !important; }
+.sk-kpi-number.sapMObjectNumberStatusNone    .sapMObjectNumberText { color: var(--sk-text)    !important; }
+.sk-kpi-number .sapMObjectNumberUnit { display: none !important; }
+.sk-kpi-sublabel {
+  font-size:  12px            !important;
+  color:      var(--sk-muted) !important;
+  margin-top: 4px             !important;
+}
+
+/* ── Table ───────────────────────────────────────────────── */
+.sk-table .sapMListTbl-outer {
+  background:    var(--sk-surface)           !important;
+  border:        1px solid var(--sk-border)  !important;
+  border-radius: 12px                        !important;
+  overflow:      hidden                      !important;
+  box-shadow:    var(--sk-shadow)            !important;
+  margin:        0 24px                      !important;
+}
+.sk-table .sapMListTblHeaderCell .sapMLabel,
+.sk-table .sapMListTblHeaderCell .sapMText {
+  font-size:      12px              !important;
+  font-weight:    700               !important;
+  color:          var(--sk-muted)   !important;
+  text-transform: uppercase         !important;
+  letter-spacing: .4px              !important;
+}
+.sk-table .sapMLIB:nth-child(even) { background: #fafafa !important; }
+.sk-table .sapMLIB:hover           { background: #f0f4ff !important; cursor: pointer; }
+.sk-table .sapMLIB                 { border-bottom: 1px solid #f8fafc !important; }
+.sk-table .sapMBar-CTX .sapMTitle {
+  font-size:   16px             !important;
+  font-weight: 700              !important;
+  color:       var(--sk-text)   !important;
+}
+
+/* ── ObjectStatus badge pills ────────────────────────────── */
+.sapMObjectStatus .sapMObjectStatusText {
+  border-radius: 20px !important;
+  padding:       2px 10px !important;
+  font-size:     13px !important;
+  font-weight:   600  !important;
+}
+.sapMObjectStatusWarning .sapMObjectStatusText {
+  background: var(--sk-warning-bg)           !important;
+  color:      var(--sk-warning-tx)           !important;
+  border:     1px solid var(--sk-warning-bd) !important;
+}
+.sapMObjectStatusSuccess .sapMObjectStatusText {
+  background: var(--sk-success-bg)           !important;
+  color:      var(--sk-success-tx)           !important;
+  border:     1px solid var(--sk-success-bd) !important;
+}
+.sapMObjectStatusError .sapMObjectStatusText {
+  background: var(--sk-danger-bg)            !important;
+  color:      var(--sk-danger-tx)            !important;
+  border:     1px solid var(--sk-danger-bd)  !important;
+}
+.sapMObjectStatusNone .sapMObjectStatusText {
+  background: #f1f5f9                        !important;
+  color:      var(--sk-subtext)              !important;
+  border:     1px solid var(--sk-border)     !important;
+}
+
+/* ── Primary button ──────────────────────────────────────── */
+.sapMBtnEmphasized .sapMBtnInner {
+  background:    var(--sk-primary)   !important;
+  border-color:  var(--sk-primary)   !important;
+  border-radius: 8px                 !important;
+}
+.sapMBtnEmphasized .sapMBtnInner:hover {
+  background:   var(--sk-primary-dark) !important;
+  border-color: var(--sk-primary-dark) !important;
+}
+
+/* ── Select / Input ──────────────────────────────────────── */
+.sapMSlt .sapMSltLabel,
+.sapMInputBaseInner {
+  border-color:  var(--sk-border) !important;
+  border-radius: 6px              !important;
+}
+
+/* ── Page padding reset ───────────────────────────────────── */
+.sapMPage > section { padding-top: 0 !important; }
+
+/* ── Calendar grid (core:HTML) ───────────────────────────── */
+.sk-grid { width: 100%; }
+.sk-grid > div { width: 100%; }
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar             { width: 5px; height: 5px; }
+::-webkit-scrollbar-track       { background: transparent; }
+::-webkit-scrollbar-thumb       { background: var(--sk-border); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--sk-muted); }

@@ -1,0 +1,159 @@
+ID: sysko-gestione-ferie
+_schema-version: '2.1'
+version: 1.0.0
+description: SYSKO - Gestione Ferie e Permessi (SAP BTP CAP)
+
+parameters:
+  enable-parallel-deployments: true
+
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci --no-optional
+        - npx cds build --production
+
+modules:
+
+  # ── Database deployer (HDI container) ──────────────────────────────────────
+  - name: sysko-gestione-ferie-db
+    type: hdb
+    path: db
+    parameters:
+      memory: 256M
+      disk-quota: 512M
+      buildpack: nodejs_buildpack
+      stack: cflinuxfs4
+    build-parameters:
+      ignore: ["node_modules", "package-lock.json", "default-env.json", ".env", "docs/", "*.pptx", "*.docx"]
+    requires:
+      - name: sysko-gestione-ferie-hdi-container
+        properties:
+          TARGET_CONTAINER: ~{hdi-container-name}
+
+  # ── Backend CAP Node.js ────────────────────────────────────────────────────
+  - name: sysko-gestione-ferie-srv
+    type: nodejs
+    path: .
+    parameters:
+      routes:
+        - route: '${org}-${space}-ferie-srv.${default-domain}'
+      memory: 512M
+      disk-quota: 512M
+      buildpack: nodejs_buildpack
+      stack: cflinuxfs4
+    build-parameters:
+      ignore: [".*/", "*default-env.json", "./db/node_modules", "./node_modules", "./mta_archives", "./app/index.html", "docs/", "*.pptx", "*.docx"]
+    provides:
+      - name: srv_api
+        properties:
+          url: '${default-url}'
+    requires:
+      - name: sysko-gestione-ferie-hdi-container
+      - name: sysko-gestione-ferie-uaa
+      - name: sysko-gestione-ferie-logs
+      - name: sysko-gestione-ferie-destination
+      - name: sysko-gestione-ferie-jobscheduler
+      - name: sysko-gestione-ferie-autoscaler
+        parameters:
+          config:
+            instance_min_count: 1
+            instance_max_count: 5
+            scaling_rules:
+              - metric_type: memoryutil
+                breach_duration_secs: 60
+                threshold: 70
+                operator: ">="
+                adjustment: "+1"
+              - metric_type: cpu
+                breach_duration_secs: 60
+                threshold: 60
+                operator: ">="
+                adjustment: "+1"
+              - metric_type: memoryutil
+                breach_duration_secs: 60
+                threshold: 20
+                operator: "<"
+                adjustment: "-1"
+    properties:
+      OPTIMIZE_MEMORY: true
+      mailService: '{"destinationName": "MailService_Sysko"}'
+
+resources:
+
+  # ── HDI Container HANA Cloud ───────────────────────────────────────────────
+  - name: sysko-gestione-ferie-hdi-container
+    type: com.sap.xs.hdi-container
+    properties:
+      hdi-container-name: '${service-name}'
+
+  # ── XSUAA (Authentication & Authorization) ────────────────────────────────
+  - name: sysko-gestione-ferie-uaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      config:
+        xsappname: "sysko-gestione-ferie-${space}"
+        tenant-mode: dedicated
+        scopes:
+          - name: "$XSAPPNAME.Employee"
+            description: "Dipendente: crea e gestisce le proprie richieste ferie"
+          - name: "$XSAPPNAME.Manager"
+            description: "Manager: approva/rifiuta richieste e visualizza la dashboard"
+        role-templates:
+          - name: Employee
+            description: "Ruolo dipendente"
+            scope-references:
+              - "$XSAPPNAME.Employee"
+          - name: Manager
+            description: "Ruolo manager (include Employee)"
+            scope-references:
+              - "$XSAPPNAME.Employee"
+              - "$XSAPPNAME.Manager"
+        role-collections:
+          - name: Ferie_Employee
+            description: "Accesso dipendente alla gestione ferie"
+            role-template-references:
+              - "$XSAPPNAME.Employee"
+          - name: Ferie_Manager
+            description: "Accesso manager alla gestione ferie"
+            role-template-references:
+              - "$XSAPPNAME.Manager"
+        oauth2-configuration:
+          redirect-uris:
+            - http://localhost:**
+            - https://*.hana.ondemand.com/**
+            - https://*.applicationstudio.cloud.sap/**
+
+  # ── Application Logs ──────────────────────────────────────────────────────
+  - name: sysko-gestione-ferie-logs
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: application-logs
+      service-plan: lite
+      service-name: sysko-gestione-ferie-logs
+
+  # ── Autoscaler ────────────────────────────────────────────────────────────
+  - name: sysko-gestione-ferie-autoscaler
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: autoscaler
+      service-plan: standard
+      service-name: sysko-gestione-ferie-autoscaler
+
+  # ── Job Scheduler ─────────────────────────────────────────────────────────
+  - name: sysko-gestione-ferie-jobscheduler
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: jobscheduler
+      service-plan: standard
+      service-name: sysko-gestione-ferie-jobscheduler
+
+  # ── Destination Service (es. per Email o API esterne) ─────────────────────
+  - name: sysko-gestione-ferie-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+      service-name: sysko-gestione-ferie-destination

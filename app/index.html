@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SYSKO – Gestione Ferie</title>
+  <script id="sap-ui-bootstrap"
+    src="https://sdk.openui5.org/1.120/resources/sap-ui-core.js"
+    data-sap-ui-theme="sap_horizon"
+    data-sap-ui-libs="sap.m,sap.ui.core"
+    data-sap-ui-compatVersion="edge"
+    data-sap-ui-async="true">
+  </script>
+  <script>
+  sap.ui.getCore().attachInit(function () {
+    sap.ui.require([
+      "sap/m/Shell", "sap/m/App", "sap/m/Page",
+      "sap/m/VBox", "sap/m/Text",
+      "sap/m/Select", "sap/m/Input", "sap/m/Button",
+      "sap/m/MessageStrip", "sap/ui/core/Item", "sap/ui/core/HTML"
+    ],
+    function (Shell, App, Page, VBox, Text,
+              Select, Input, Button, MessageStrip, Item, HTML) {
+
+      /* ── role map (mirrors package.json dummy users) ── */
+      var oRoleMap = {
+        "mario.rossi@sysko.it":    { role: "Employee", name: "Mario Rossi" },
+        "giulia.bianchi@sysko.it": { role: "Employee", name: "Giulia Bianchi" },
+        "sara.neri@sysko.it":      { role: "Employee", name: "Sara Neri" },
+        "luca.verdi@sysko.it":     { role: "Manager",  name: "Luca Verdi" },
+        "paolo.ferrari@sysko.it":  { role: "Manager",  name: "Paolo Ferrari" }
+      };
+
+      /* ── error strip ── */
+      var oErrorStrip = new MessageStrip({
+        type: "Error",
+        showIcon: true,
+        visible: false
+      }).addStyleClass("sapUiSmallMarginBottom");
+
+      /* ── role hint text ── */
+      var oRoleHint = new Text({ visible: false })
+        .addStyleClass("syskoRoleHint sapUiTinyMarginTop");
+
+      /* ── email input ── */
+      var oEmailInput = new Input({
+        type: "Email",
+        placeholder: "nome.cognome@sysko.it",
+        width: "100%"
+      });
+
+      /* ── password input ── */
+      var oPasswordInput = new Input({
+        type: "Password",
+        placeholder: "••••••••",
+        width: "100%"
+      });
+
+      /* ── demo dropdown ── */
+      var oSelect = new Select({
+        width: "100%",
+        items: [
+          new Item({ key: "", text: "— Seleziona un utente —" }),
+          new Item({ key: "mario.rossi@sysko.it",    text: "Mario Rossi — Dipendente" }),
+          new Item({ key: "giulia.bianchi@sysko.it", text: "Giulia Bianchi — Dipendente" }),
+          new Item({ key: "sara.neri@sysko.it",      text: "Sara Neri — Dipendente" }),
+          new Item({ key: "luca.verdi@sysko.it",     text: "Luca Verdi — Manager" }),
+          new Item({ key: "paolo.ferrari@sysko.it",  text: "Paolo Ferrari — Manager" })
+        ],
+        change: function (oEvent) {
+          var sEmail = oEvent.getParameter("selectedItem").getKey();
+          if (!sEmail) {
+            oEmailInput.setValue("");
+            oPasswordInput.setValue("");
+            oRoleHint.setVisible(false);
+            return;
+          }
+          oEmailInput.setValue(sEmail);
+          oPasswordInput.setValue("demo");
+          var oUser = oRoleMap[sEmail];
+          var sRole = oUser ? oUser.role : "Employee";
+          oRoleHint.setText(
+            "Ruolo rilevato: " + (sRole === "Manager" ? "Manager" : "Dipendente")
+          );
+          oRoleHint.removeStyleClass("syskoRoleManager syskoRoleEmployee");
+          oRoleHint.addStyleClass(sRole === "Manager" ? "syskoRoleManager" : "syskoRoleEmployee");
+          oRoleHint.setVisible(true);
+          oErrorStrip.setVisible(false);
+        }
+      });
+
+      /* ── login button ── */
+      var oLoginBtn = new Button({
+        text: "Accedi →",
+        type: "Emphasized",
+        width: "100%",
+        press: function () {
+          var sEmail    = oEmailInput.getValue().trim();
+          var sPassword = oPasswordInput.getValue();
+
+          if (!sEmail || !sPassword) {
+            oErrorStrip.setText("Inserisci email e password.");
+            oErrorStrip.setVisible(true);
+            return;
+          }
+
+          oLoginBtn.setEnabled(false);
+          oErrorStrip.setVisible(false);
+
+          var oUser0   = oRoleMap[sEmail];
+          var sRole0   = oUser0 ? oUser0.role : "Employee";
+          var sEndpoint = sRole0 === "Manager" ? "/manager/" : "/employee/";
+          var sToken = btoa(unescape(encodeURIComponent(sEmail + ":" + sPassword)));
+          fetch(sEndpoint, { headers: { Authorization: "Basic " + sToken } })
+            .then(function (res) {
+              if (res.ok) {
+                var oUser = oRoleMap[sEmail];
+                var sRole = oUser ? oUser.role : "Employee";
+                var sName = oUser ? oUser.name : sEmail;
+                // FIX: salviamo il token già calcolato — i controller non ricostruiranno la password
+                sessionStorage.setItem("sysko_user",
+                  JSON.stringify({ email: sEmail, role: sRole, name: sName, token: sToken }));
+                window.location.href = sRole === "Manager"
+                  ? "/manager/webapp/index.html"
+                  : "/employee/webapp/index.html";
+              } else {
+                oErrorStrip.setText("Email o password non validi. Riprova.");
+                oErrorStrip.setVisible(true);
+                oPasswordInput.setValue("");
+                oLoginBtn.setEnabled(true);
+              }
+            })
+            .catch(function () {
+              oErrorStrip.setText("Email o password non validi. Riprova.");
+              oErrorStrip.setVisible(true);
+              oPasswordInput.setValue("");
+              oLoginBtn.setEnabled(true);
+            });
+        }
+      }).addStyleClass("sapUiSmallMarginTop");
+
+      /* ── logo area (custom HTML for gradient circle) ── */
+      var oLogo = new HTML({
+        content: '<div class="syskoLogoWrap">' +
+                   '<div class="syskoLogoCircle">SK</div>' +
+                   '<div class="syskoLogoTitle">SYSKO</div>' +
+                   '<div class="syskoLogoSub">Gestione Ferie &amp; Permessi</div>' +
+                 '</div>'
+      });
+
+      /* ── card layout ── */
+      var oCard = new VBox({
+        items: [
+          oLogo,
+          new Text({ text: "Accesso rapido demo" }).addStyleClass("syskoFieldLabel"),
+          oSelect,
+          oRoleHint,
+          new HTML({ content: '<div class="syskoSeparator"><span>oppure inserisci manualmente</span></div>' }),
+          new Text({ text: "Email aziendale" }).addStyleClass("syskoFieldLabel"),
+          oEmailInput,
+          new Text({ text: "Password" }).addStyleClass("syskoFieldLabel sapUiTinyMarginTop"),
+          oPasswordInput,
+          oErrorStrip,
+          oLoginBtn
+        ]
+      }).addStyleClass("syskoLoginCard");
+
+      /* ── page ── */
+      var oApp = new App();
+      oApp.addPage(new Page({
+        showHeader: false,
+        content: [
+          new VBox({
+            alignItems: "Center",
+            justifyContent: "Center",
+            height: "100%",
+            items: [ oCard ]
+          }).addStyleClass("syskoLoginBg")
+        ]
+      }));
+
+      new Shell({ app: oApp }).placeAt("content");
+    });
+  });
+  </script>
+  <style>
+    /* ── page background ──────────────────────────── */
+    html, body.sapUiBody {
+      height: 100%;
+      background: #f0f4ff;
+    }
+    .sapMShell {
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(0,112,242,.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(108,99,255,.06) 0%, transparent 50%),
+        #f0f4ff !important;
+    }
+    .syskoLoginBg {
+      min-height:  100vh;
+      padding:     2rem 1rem;
+      box-sizing:  border-box;
+      background-image:
+        linear-gradient(rgba(0,112,242,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,112,242,.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* ── login card ───────────────────────────────── */
+    .syskoLoginCard {
+      background:    #ffffff;
+      border-radius: 20px;
+      box-shadow:
+        0 20px 60px rgba(0,112,242,.10),
+        0 4px 16px rgba(0,0,0,.05);
+      padding:   2.75rem 2.5rem 2.25rem;
+      width:     100%;
+      max-width: 400px;
+    }
+
+    /* ── logo ─────────────────────────────────────── */
+    .syskoLogoWrap   { text-align: center; margin-bottom: 1.75rem; }
+    .syskoLogoCircle {
+      width:           60px;
+      height:          60px;
+      background:      linear-gradient(135deg, #0070f2, #003d8f);
+      border-radius:   50%;
+      margin:          0 auto 0.75rem;
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      color:           #fff;
+      font-size:       1.35rem;
+      font-weight:     800;
+      letter-spacing:  1px;
+      font-family:     "72", Arial, sans-serif;
+      box-shadow:      0 6px 20px rgba(0,112,242,.35);
+    }
+    .syskoLogoTitle {
+      font-size:     1.2rem;
+      font-weight:   700;
+      color:         #1e293b;
+      margin-bottom: .2rem;
+      font-family:   "72", Arial, sans-serif;
+    }
+    .syskoLogoSub {
+      font-size:   .8rem;
+      color:       #94a3b8;
+      font-family: "72", Arial, sans-serif;
+    }
+
+    /* ── field labels ────────────────────────────── */
+    .syskoFieldLabel {
+      font-size:     .78rem  !important;
+      font-weight:   600     !important;
+      color:         #475569 !important;
+      margin-bottom: .3rem   !important;
+      margin-top:    1rem    !important;
+      display:       block;
+    }
+
+    /* ── inputs ──────────────────────────────────── */
+    .sapMInputBase .sapMInputBaseInner,
+    .sapMSlt .sapMSltLabel {
+      border:        1.5px solid #e2e8f0 !important;
+      border-radius: 8px                 !important;
+      padding:       10px 14px           !important;
+      font-size:     .875rem             !important;
+      transition:    border-color .15s, box-shadow .15s !important;
+    }
+    .sapMInputBase.sapMInputBaseFocused .sapMInputBaseInner,
+    .sapMSlt:focus-within .sapMSltLabel {
+      border-color: #0070f2                          !important;
+      box-shadow:   0 0 0 3px rgba(0,112,242,.14)   !important;
+    }
+
+    /* ── login button ────────────────────────────── */
+    .sapMBtnEmphasized .sapMBtnInner {
+      background:    #0070f2 !important;
+      border-color:  #0070f2 !important;
+      border-radius: 10px    !important;
+      padding:       10px 0  !important;
+      font-size:     .9rem   !important;
+      font-weight:   700     !important;
+      transition:    background .15s, box-shadow .15s !important;
+    }
+    .sapMBtnEmphasized .sapMBtnInner:hover {
+      background:   #003d8f                         !important;
+      border-color: #003d8f                         !important;
+      box-shadow:   0 4px 12px rgba(0,112,242,.3)   !important;
+    }
+
+    /* ── separator ───────────────────────────────── */
+    .syskoSeparator {
+      display:     flex;
+      align-items: center;
+      margin:      1rem 0 .25rem;
+      color:       #94a3b8;
+      font-size:   .72rem;
+      font-family: "72", Arial, sans-serif;
+    }
+    .syskoSeparator::before,
+    .syskoSeparator::after { content: ""; flex: 1; height: 1px; background: #e2e8f0; }
+    .syskoSeparator span   { padding: 0 .75rem; white-space: nowrap; }
+
+    /* ── role hint ───────────────────────────────── */
+    .syskoRoleHint    {
+      font-size:     .75rem !important;
+      padding:       .25rem .6rem;
+      border-radius: 10px;
+      display:       inline-block;
+    }
+    .syskoRoleEmployee { background: #f0fdf4 !important; color: #16a34a !important; }
+    .syskoRoleManager  { background: #eff6ff !important; color: #1d4ed8 !important; }
+  </style>
+</head>
+<body class="sapUiBody" id="content"></body>
+</html>

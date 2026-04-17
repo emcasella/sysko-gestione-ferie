@@ -1,0 +1,6 @@
+ID,dipendente_ID,anno,giorniTotali,giorniUsati,giorniResidui,giorniPermesso,giorniPermessoUsati,giorniRolUsati,giorniMalattiaUsati,giorniLuttoTotali,giorniLuttoUsati,giorniMatrimonioTotali,giorniMatrimonioUsati
+s1,d1,2026,30,9,21,8,0,0,0,3,0,15,0
+s2,d2,2026,30,6,24,8,0,0,0,3,0,15,0
+s3,d3,2026,30,0,30,8,0,0,0,3,0,15,0
+s4,d4,2026,30,0,30,8,0,0,3,3,0,15,0
+s5,d5,2026,30,0,30,8,0,0,0,3,0,15,0

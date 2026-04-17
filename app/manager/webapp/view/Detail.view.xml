@@ -1,0 +1,138 @@
+<mvc:View
+  controllerName="sysko.ferie.manager.controller.Detail"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:form="sap.ui.layout.form"
+  xmlns:core="sap.ui.core"
+  displayBlock="true">
+
+  <Page title="Dettaglio Richiesta" showNavButton="true" navButtonPress=".onNavBack">
+
+    <headerContent>
+      <Button id="btnApprova"
+              text="Approva"
+              type="Accept"
+              icon="sap-icon://accept"
+              visible="{ui>/canApprove}"
+              press=".onApprova"/>
+      <Button id="btnRifiuta"
+              text="Rifiuta"
+              type="Reject"
+              icon="sap-icon://decline"
+              visible="{ui>/canApprove}"
+              press=".onRifiuta"
+              class="sapUiTinyMarginBegin"/>
+    </headerContent>
+
+    <content>
+
+      <!-- Forza dipendente_ID nel $select OData (usato dal controller per lo storico) -->
+      <core:InvisibleText text="{dipendente_ID}"/>
+
+      <ObjectHeader
+        title="{dipendanteCognome} {dipendanteNome}"
+        responsive="true">
+        <statuses>
+          <ObjectStatus
+            title="Stato"
+            text="{path: 'stato', formatter: '.formatter.statusText'}"
+            state="{path: 'stato', formatter: '.formatter.statusState'}"/>
+          <ObjectStatus title="Reparto"  text="{repartoNome}"/>
+          <ObjectStatus title="Anno"     text="{path: 'anno', type: 'sap.ui.model.odata.type.Int32', formatOptions: {groupingEnabled: false}}"/>
+        </statuses>
+        <attributes>
+          <ObjectAttribute title="Email"  text="{dipendanteEmail}"/>
+          <ObjectAttribute title="Tipo"   text="{tipoAssenzaLabel}"/>
+          <ObjectAttribute title="Dal"
+            text="{path: 'dataInizio', formatter: '.formatter.formatDate'}"/>
+          <ObjectAttribute title="Al"
+            text="{path: 'dataFine', formatter: '.formatter.formatDate'}"/>
+          <ObjectAttribute title="Giorni"
+            text="{path: 'giorniRichiesti', type: 'sap.ui.model.odata.type.Decimal', formatOptions: {minFractionDigits: 0, maxFractionDigits: 2}}"/>
+        </attributes>
+      </ObjectHeader>
+
+      <form:SimpleForm
+        editable="false"
+        layout="ResponsiveGridLayout"
+        labelSpanXL="3" labelSpanL="3" labelSpanM="4"
+        columnsXL="2" columnsL="2" columnsM="1"
+        class="sapUiResponsiveMargin">
+        <form:content>
+
+          <core:Title text="Richiesta"/>
+          <Label text="Tipo Assenza"/>   <Text text="{tipoAssenzaLabel}"/>
+          <Label text="Bene Ceduto"/>    <Text text="{beneCeduto}"/>
+          <Label text="Data Inizio"/>    <Text text="{path: 'dataInizio', formatter: '.formatter.formatDate'}"/>
+          <Label text="Data Fine"/>      <Text text="{path: 'dataFine',   formatter: '.formatter.formatDate'}"/>
+          <Label text="Giorni"/>         <Text text="{path: 'giorniRichiesti', type: 'sap.ui.model.odata.type.Decimal', formatOptions: {minFractionDigits: 0, maxFractionDigits: 2}}"/>
+          <Label text="Data Invio"/>     <Text text="{dataInvio}"/>
+          <Label text="N° Invii"/>       <Text text="{invii}"/>
+          <Label text="Note Dipendente"/><Text text="{note}"/>
+
+          <core:Title text="Decisione"/>
+          <Label text="Stato"/>
+          <ObjectStatus
+            text="{path: 'stato', formatter: '.formatter.statusText'}"
+            state="{path: 'stato', formatter: '.formatter.statusState'}"/>
+          <Label text="Note Manager"/>   <Text text="{noteManager}"/>
+          <Label text="Gestita da"/>     <Text text="{managerCognome} {managerNome}"/>
+          <Label text="Data Decisione"/> <Text text="{dataDecisione}"/>
+
+        </form:content>
+      </form:SimpleForm>
+
+      <!-- ── Storico Assenze Dipendente ──────────────────────── -->
+      <Panel
+        headerText="Storico Assenze Dipendente"
+        expandable="true"
+        expanded="true"
+        class="sapUiResponsiveMargin">
+        <content>
+
+          <!-- Riepilogo Saldi Annuali -->
+          <Title text="Riepilogo Saldi Annuali" level="H4" class="sapUiSmallMargin"/>
+          <List
+            items="{storico>/saldi}"
+            noDataText="Nessun saldo disponibile"
+            showSeparators="Inner">
+            <ObjectListItem
+              title="Anno {storico>anno}"
+              type="Inactive">
+              <attributes>
+                <ObjectAttribute title="Ferie usate"  text="{path: 'storico>giorniUsati',         formatter: '.formatter.formatGiorni'} gg"/>
+                <ObjectAttribute title="Ferie totali" text="{path: 'storico>giorniTotali',        formatter: '.formatter.formatGiorni'} gg"/>
+                <ObjectAttribute title="Permessi"     text="{path: 'storico>giorniPermessoUsati', formatter: '.formatter.formatGiorni'} gg"/>
+                <ObjectAttribute title="Malattia"     text="{path: 'storico>giorniMalattiaUsati', formatter: '.formatter.formatGiorni'} gg"/>
+                <ObjectAttribute title="ROL"          text="{path: 'storico>giorniRolUsati',      formatter: '.formatter.formatGiorni'} gg"/>
+              </attributes>
+            </ObjectListItem>
+          </List>
+
+          <!-- Richieste Approvate Anno Corrente e Precedenti -->
+          <Title text="Richieste Approvate (anno corrente e precedenti)" level="H4"
+                 class="sapUiSmallMargin sapUiSmallMarginTop"/>
+          <List
+            id="storicoRichiesteList"
+            items="{storico>/richieste}"
+            noDataText="Nessuna richiesta approvata"
+            showSeparators="Inner">
+            <ObjectListItem
+              title="{storico>tipoAssenzaLabel}"
+              intro="Anno {storico>anno}"
+              number="{path: 'storico>giorniRichiesti', formatter: '.formatter.formatGiorni'}"
+              numberUnit="gg"
+              type="Inactive">
+              <attributes>
+                <ObjectAttribute title="Dal" text="{path: 'storico>dataInizio', formatter: '.formatter.formatDate'}"/>
+                <ObjectAttribute title="Al"  text="{path: 'storico>dataFine',   formatter: '.formatter.formatDate'}"/>
+              </attributes>
+            </ObjectListItem>
+          </List>
+
+        </content>
+      </Panel>
+
+    </content>
+  </Page>
+</mvc:View>

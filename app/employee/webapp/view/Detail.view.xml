@@ -1,0 +1,93 @@
+<mvc:View
+  controllerName="sysko.ferie.employee.controller.Detail"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:form="sap.ui.layout.form"
+  xmlns:core="sap.ui.core"
+  displayBlock="true">
+
+  <Page id="detailPage" title="Dettaglio Richiesta"
+        showNavButton="true" navButtonPress=".onNavBack">
+
+    <headerContent>
+      <Button id="btnAnnulla"
+              text="Annulla"
+              type="Reject"
+              icon="sap-icon://decline"
+              visible="{ui>/canAnnulla}"
+              press=".onAnnulla"/>
+      <Button id="btnModifica"
+              text="Modifica"
+              type="Emphasized"
+              icon="sap-icon://edit"
+              visible="{ui>/canModifica}"
+              press=".onModifica"/>
+    </headerContent>
+
+    <content>
+
+      <!-- Object header -->
+      <ObjectHeader id="objHeader"
+        title="{tipoAssenzaLabel}"
+        responsive="true">
+        <statuses>
+          <ObjectStatus
+            title="Stato"
+            text="{path: 'stato', formatter: '.formatter.statusText'}"
+            state="{path: 'stato', formatter: '.formatter.statusState'}"/>
+          <ObjectStatus title="Anno" text="{path: 'anno', type: 'sap.ui.model.odata.type.Int32', formatOptions: {groupingEnabled: false}}"/>
+          <ObjectStatus title="Invii" text="{invii}"/>
+        </statuses>
+        <attributes>
+          <ObjectAttribute title="Dal"
+            text="{path: 'dataInizio', formatter: '.formatter.formatDate'}"/>
+          <ObjectAttribute title="Al"
+            text="{path: 'dataFine', formatter: '.formatter.formatDate'}"/>
+          <ObjectAttribute title="Giorni"
+            text="{path: 'giorniRichiesti', type: 'sap.ui.model.odata.type.Decimal', formatOptions: {minFractionDigits: 0, maxFractionDigits: 2}}"/>
+        </attributes>
+      </ObjectHeader>
+
+      <!-- Riquadro avviso rifiuto -->
+      <MessageStrip id="rejectedStrip"
+        text="La tua richiesta è stata rifiutata. Puoi crearne una nuova."
+        type="Error"
+        showIcon="true"
+        visible="{ui>/isRejected}"
+        class="sapUiResponsiveMargin"/>
+
+      <!-- Dettaglio -->
+      <form:SimpleForm
+        editable="false"
+        layout="ResponsiveGridLayout"
+        labelSpanXL="3" labelSpanL="3" labelSpanM="4"
+        columnsXL="2" columnsL="2" columnsM="1"
+        class="sapUiResponsiveMargin">
+        <form:content>
+
+          <core:Title text="Richiesta"/>
+          <Label text="Tipo Assenza"/>  <Text text="{tipoAssenzaLabel}"/>
+          <Label text="Bene Ceduto" visible="{ui>/isBeneCeduto}"/>
+          <Text text="{beneCeduto}"    visible="{ui>/isBeneCeduto}"/>
+          <Label text="Data Inizio"/>   <Text text="{path: 'dataInizio', formatter: '.formatter.formatDate'}"/>
+          <Label text="Data Fine"/>     <Text text="{path: 'dataFine',   formatter: '.formatter.formatDate'}"/>
+          <Label text="Giorni"/>        <Text text="{path: 'giorniRichiesti', type: 'sap.ui.model.odata.type.Decimal', formatOptions: {minFractionDigits: 0, maxFractionDigits: 2}}"/>
+          <Label text="Anno"/>          <Text text="{path: 'anno', type: 'sap.ui.model.odata.type.Int32', formatOptions: {groupingEnabled: false}}"/>
+          <Label text="Data Invio"/>    <Text text="{dataInvio}"/>
+          <Label text="Note"/>          <Text text="{note}"/>
+
+          <core:Title text="Risposta Manager"/>
+          <Label text="Stato"/>
+          <ObjectStatus
+            text="{path: 'stato', formatter: '.formatter.statusText'}"
+            state="{path: 'stato', formatter: '.formatter.statusState'}"/>
+          <Label text="Note Manager"/>  <Text text="{noteManager}"/>
+          <Label text="Gestito da"/>    <Text text="{managerCognome} {managerNome}"/>
+          <Label text="Data Decisione"/><Text text="{dataDecisione}"/>
+
+        </form:content>
+      </form:SimpleForm>
+
+    </content>
+  </Page>
+</mvc:View>

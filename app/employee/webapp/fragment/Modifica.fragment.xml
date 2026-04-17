@@ -1,0 +1,61 @@
+<core:FragmentDefinition
+  xmlns:core="sap.ui.core"
+  xmlns="sap.m"
+  xmlns:l="sap.ui.layout.form">
+
+  <Dialog title="Modifica Richiesta" contentWidth="420px" draggable="true">
+    <content>
+      <l:SimpleForm
+        editable="true" layout="ResponsiveGridLayout"
+        labelSpanXL="4" labelSpanL="4" labelSpanM="4"
+        columnsXL="1" columnsL="1" columnsM="1"
+        class="sapUiSmallMarginTop">
+        <l:content>
+
+          <Label text="Tipo Assenza" required="true"/>
+          <Select id="selModTipo" width="100%" forceSelection="false"
+                  change=".onModTipoChange">
+            <items>
+              <core:Item key="FERIE"          text="Ferie"/>
+              <core:Item key="PERMESSO"       text="Permesso"/>
+              <core:Item key="ROL"            text="ROL"/>
+              <core:Item key="MALATTIA"       text="Malattia"/>
+              <core:Item key="LUTTO"          text="Lutto"/>
+              <core:Item key="MATRIMONIO"     text="Matrimonio"/>
+              <core:Item key="FERIE_FITTIZIE" text="Ferie Fittizie"/>
+            </items>
+          </Select>
+
+          <Label text="Bene Ceduto" required="true" visible="{edit>/isFittizio}"/>
+          <TextArea id="taModBeneCeduto" value="{edit>/beneCeduto}" rows="2" width="100%"
+                    visible="{edit>/isFittizio}"/>
+
+          <Label text="Data Inizio" required="true"/>
+          <DatePicker id="dpModInizio"
+            value="{edit>/dataInizio}"
+            valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy"
+            width="100%"/>
+
+          <Label text="Data Fine" required="true"/>
+          <DatePicker id="dpModFine"
+            value="{edit>/dataFine}"
+            valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy"
+            width="100%"/>
+
+          <Label text="Note"/>
+          <TextArea id="taModNota" value="{edit>/note}" rows="3" width="100%"/>
+
+        </l:content>
+      </l:SimpleForm>
+    </content>
+
+    <beginButton>
+      <Button text="Salva" type="Emphasized"
+              icon="sap-icon://save" press=".onSubmitModifica"/>
+    </beginButton>
+    <endButton>
+      <Button text="Annulla" press=".onCancelModifica"/>
+    </endButton>
+  </Dialog>
+
+</core:FragmentDefinition>

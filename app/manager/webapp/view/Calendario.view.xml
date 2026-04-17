@@ -1,0 +1,51 @@
+<mvc:View
+  controllerName="sysko.ferie.manager.controller.Calendario"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:core="sap.ui.core"
+  displayBlock="true">
+
+  <Page showHeader="false" backgroundDesign="Transparent" class="sapUiNoContentPadding">
+    <content>
+
+      <!-- ── Page header ── -->
+      <Toolbar class="sk-page-header">
+        <Title text="Calendario Ferie" level="H1"/>
+        <ToolbarSpacer/>
+        <Button icon="sap-icon://nav-back" tooltip="Mese precedente" press=".onPrevMonth"/>
+        <Title id="calTitle" text="" class="sapUiSmallMarginBeginEnd"/>
+        <Button icon="sap-icon://slim-arrow-right" tooltip="Mese successivo" press=".onNextMonth"/>
+      </Toolbar>
+
+      <!-- ── Legenda ── -->
+      <HBox class="sk-legend">
+        <HBox alignItems="Center" class="sk-legend-item">
+          <core:HTML content="&lt;span class='sk-legend-dot' style='background:#c8e6c9'&gt;&lt;/span&gt;"/>
+          <Text text="1-2 approvati"/>
+        </HBox>
+        <HBox alignItems="Center" class="sk-legend-item">
+          <core:HTML content="&lt;span class='sk-legend-dot' style='background:#fff9c4;border:1px solid #f9a825'&gt;&lt;/span&gt;"/>
+          <Text text="3-4 approvati"/>
+        </HBox>
+        <HBox alignItems="Center" class="sk-legend-item">
+          <core:HTML content="&lt;span class='sk-legend-dot' style='background:#ffcdd2'&gt;&lt;/span&gt;"/>
+          <Text text="5+ approvati"/>
+        </HBox>
+        <HBox alignItems="Center" class="sk-legend-item">
+          <core:HTML content="&lt;span class='sk-legend-dot' style='background:#ff9800;border-radius:50%'&gt;&lt;/span&gt;"/>
+          <Text text="In attesa"/>
+        </HBox>
+        <HBox alignItems="Center" class="sk-legend-item">
+          <core:HTML content="&lt;span class='sk-legend-dot' style='background:#8e24aa;border-radius:50%'&gt;&lt;/span&gt;"/>
+          <Text text="Ferie Fittizie"/>
+        </HBox>
+      </HBox>
+
+      <!-- ── Griglia calendario (renderizzata dal controller) ── -->
+      <core:HTML id="calHtml" content="&lt;div&gt;Caricamento...&lt;/div&gt;"
+                 class="sk-grid"/>
+
+    </content>
+  </Page>
+
+</mvc:View>

@@ -1,0 +1,8 @@
+code,name,descr,giorniMassimiAnnui,richiedeApprovazione
+FERIE,Ferie,Ferie annuali retribuite,30,true
+PERMESSO,Permesso,Permesso orario / giornaliero,8,true
+ROL,ROL,Riduzione orario di lavoro,0,true
+MALATTIA,Malattia,Assenza per malattia,0,false
+LUTTO,Lutto,Congedo per lutto familiare,3,false
+MATRIMONIO,Matrimonio,Congedo matrimoniale,15,false
+FERIE_FITTIZIE,Ferie Fittizie,Cessione bene aziendale,0,true

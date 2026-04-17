@@ -1,0 +1,6 @@
+ID,matricola,nome,cognome,email,ruolo,esterno,reparto_ID,manager_ID
+d1,MAT001,Mario,Rossi,mario.rossi@sysko.it,EMPLOYEE,false,r1,d3
+d2,MAT002,Giulia,Bianchi,giulia.bianchi@sysko.it,EMPLOYEE,true,r1,d3
+d3,MAT003,Luca,Verdi,luca.verdi@sysko.it,MANAGER,false,r1,
+d4,MAT004,Sara,Neri,sara.neri@sysko.it,EMPLOYEE,true,r3,d5
+d5,MAT005,Paolo,Ferrari,paolo.ferrari@sysko.it,MANAGER,false,r3,

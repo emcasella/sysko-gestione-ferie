@@ -1,0 +1,64 @@
+{
+  "_version": "1.65.0",
+  "sap.app": {
+    "id": "sysko.ferie.employee",
+    "type": "application",
+    "title": "Le Mie Ferie",
+    "dataSources": {
+      "mainService": {
+        "uri": "/employee/",
+        "type": "OData",
+        "settings": { "odataVersion": "4.0" }
+      }
+    }
+  },
+  "sap.ui": { "technology": "UI5" },
+  "sap.ui5": {
+    "dependencies": {
+      "minUI5Version": "1.120.0",
+      "libs": { "sap.m": {}, "sap.ui.core": {}, "sap.ui.layout": {} }
+    },
+    "resources": {
+      "css": [
+        { "uri": "css/style.css" }
+      ]
+    },
+    "rootView": {
+      "viewName": "sysko.ferie.employee.view.App",
+      "type": "XML",
+      "async": true,
+      "id": "app"
+    },
+    "models": {
+      "": {
+        "dataSource": "mainService",
+        "settings": {
+          "synchronizationMode": "None",
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "groupId": "$direct"
+        }
+      }
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "viewType": "XML",
+        "viewPath": "sysko.ferie.employee.view",
+        "controlId": "app",
+        "controlAggregation": "pages",
+        "async": true
+      },
+      "routes": [
+        { "pattern": "",              "name": "main",       "target": "main"       },
+        { "pattern": "detail/{id}",   "name": "detail",     "target": "detail"     },
+        { "pattern": "calendario",    "name": "calendario", "target": "calendario" }
+      ],
+      "targets": {
+        "main":       { "viewName": "Main",       "viewLevel": 1 },
+        "detail":     { "viewName": "Detail",     "viewLevel": 2 },
+        "calendario": { "viewName": "Calendario", "viewLevel": 2 }
+      }
+    }
+  }
+}

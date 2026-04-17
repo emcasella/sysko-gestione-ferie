@@ -1,0 +1,43 @@
+<core:FragmentDefinition
+  xmlns:core="sap.ui.core"
+  xmlns="sap.m"
+  xmlns:l="sap.ui.layout.form">
+
+  <Dialog title="Rifiuta Richiesta" contentWidth="400px" draggable="true" type="Message">
+
+    <subHeader>
+      <Bar>
+        <contentMiddle>
+          <Text text="Inserisci il motivo del rifiuto (obbligatorio)."/>
+        </contentMiddle>
+      </Bar>
+    </subHeader>
+
+    <content>
+      <l:SimpleForm
+        editable="true" layout="ResponsiveGridLayout"
+        labelSpanXL="12" labelSpanL="12" labelSpanM="12"
+        columnsXL="1" columnsL="1" columnsM="1"
+        class="sapUiSmallMarginTop">
+        <l:content>
+          <Label text="Motivo del rifiuto" required="true"/>
+          <TextArea id="taRifiutaNota"
+            value="{rifiuta>/note}"
+            rows="4"
+            width="100%"
+            placeholder="Es. Date sovrapposte con altro collega, periodo non disponibile…"
+            growing="true"/>
+        </l:content>
+      </l:SimpleForm>
+    </content>
+
+    <beginButton>
+      <Button text="Rifiuta richiesta" type="Reject"
+              icon="sap-icon://decline" press=".onSubmitRifiuta"/>
+    </beginButton>
+    <endButton>
+      <Button text="Annulla" press=".onCancelRifiuta"/>
+    </endButton>
+  </Dialog>
+
+</core:FragmentDefinition>

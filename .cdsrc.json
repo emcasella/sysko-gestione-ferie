@@ -1,0 +1,29 @@
+{
+  "requires": {
+    "auth": {
+      "kind": "basic",
+      "users": {
+        "mario.rossi@sysko.it": {
+          "roles": ["Employee"],
+          "password": "demo"
+        },
+        "giulia.bianchi@sysko.it": {
+          "roles": ["Employee"],
+          "password": "demo"
+        },
+        "sara.neri@sysko.it": {
+          "roles": ["Employee"],
+          "password": "demo"
+        },
+        "luca.verdi@sysko.it": {
+          "roles": ["Manager"],
+          "password": "demo"
+        },
+        "paolo.ferrari@sysko.it": {
+          "roles": ["Manager"],
+          "password": "demo"
+        }
+      }
+    }
+  }
+}
